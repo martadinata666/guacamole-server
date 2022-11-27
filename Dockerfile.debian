@@ -23,7 +23,7 @@
 
 # Use Debian as base for the build
 FROM martadinata666/debian:latest AS builder
-
+USER root
 #
 # Base directory for installed build artifacts.
 
