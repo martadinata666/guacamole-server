@@ -80,7 +80,7 @@ RUN ${PREFIX_DIR}/bin/list-dependencies-debian.sh     \
 
 # Use same Debian as the base for the runtime image
 FROM martadinata666/debian:latest
-
+USER root
 #
 # The Debian repository that should be preferred for dependencies (this will be
 # added to /etc/apt/sources.list if not already present)
