@@ -22,7 +22,7 @@
 #
 
 # Use Debian as base for the build
-FROM martadinata666/debian:latest AS builder
+FROM ubuntu:jammy AS builder
 USER root
 #
 # Base directory for installed build artifacts.
@@ -79,7 +79,7 @@ RUN ${PREFIX_DIR}/bin/list-dependencies-debian.sh     \
         > ${PREFIX_DIR}/DEPENDENCIES
 
 # Use same Debian as the base for the runtime image
-FROM martadinata666/debian:latest
+FROM ubuntu:jammy
 USER root
 #
 # The Debian repository that should be preferred for dependencies (this will be
@@ -130,13 +130,14 @@ RUN ${PREFIX_DIR}/bin/link-freerdp-plugins-debian.sh \
 #HEALTHCHECK --interval=30s --timeout=5s CMD nc -z 127.0.0.1 4822 || exit 1
 
 # Create a new user guacd
-#ARG UID=1000
-#ARG GID=1000
-#RUN groupadd --gid $GID guacd
-#RUN useradd --system --create-home --shell /usr/sbin/nologin --uid $UID --gid $GID guacd
+ARG UID=1000
+ARG GID=1000
+RUN groupadd --gid $GID guacd
+RUN useradd --system --create-home --shell /usr/sbin/nologin --uid $UID --gid $GID guacd
 
 # Use existing user
-USER $CONTAINERUSER
+#USER $CONTAINERUSER
+USER guacd
 
 # Expose the default listener port
 EXPOSE 4822
