@@ -22,7 +22,7 @@
 #
 
 # Use Debian as base for the build
-FROM debian:bullseye AS builder
+FROM debian:sid AS builder
 #USER root
 #
 # Base directory for installed build artifacts.
@@ -46,7 +46,7 @@ ARG BUILD_DEPENDENCIES="              \
         libpango1.0-dev               \
         libpulse-dev                  \
         libssh2-1-dev                 \
-        libssl-dev                    \
+        libgnutls28-dev                    \
         libtelnet-dev                 \
         libtool                       \
         libvncserver-dev              \
@@ -79,7 +79,7 @@ RUN ${PREFIX_DIR}/bin/list-dependencies-debian.sh     \
         > ${PREFIX_DIR}/DEPENDENCIES
 
 # Use same Debian as the base for the runtime image
-FROM debian:bullseye
+FROM debian:sid
 #USER root
 #
 # The Debian repository that should be preferred for dependencies (this will be
