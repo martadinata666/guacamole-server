@@ -37,6 +37,7 @@ RUN apk add --no-cache                \
         grep                          \
         libjpeg-turbo-dev             \
         libpng-dev                    \
+        cunit-dev                    \
         libtool                       \
         libwebp-dev                   \
         make                          \
