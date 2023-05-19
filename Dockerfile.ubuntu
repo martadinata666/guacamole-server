@@ -47,6 +47,7 @@ ARG BUILD_DEPENDENCIES="              \
         libpulse-dev                  \
         libssh2-1-dev                 \
         libssl-dev                    \
+        libcunit1-dev
         libtelnet-dev                 \
         libtool                       \
         libvncserver-dev              \
