@@ -22,7 +22,7 @@
 #
 
 # Use Debian as base for the build
-FROM debian:sid AS builder
+FROM debian:bookworm AS builder
 #USER root
 #
 # Base directory for installed build artifacts.
@@ -80,7 +80,7 @@ RUN ${PREFIX_DIR}/bin/list-dependencies-debian.sh     \
         > ${PREFIX_DIR}/DEPENDENCIES
 
 # Use same Debian as the base for the runtime image
-FROM debian:sid
+FROM debian:bookworm
 #USER root
 #
 # The Debian repository that should be preferred for dependencies (this will be
