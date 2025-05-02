@@ -22,7 +22,7 @@
 #
 
 # Use Debian as base for the build
-FROM debian:bookworm AS builder
+FROM debian:sid AS builder
 #USER root
 #
 # Base directory for installed build artifacts.
