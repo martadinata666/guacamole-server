@@ -17,14 +17,13 @@
  * under the License.
  */
 
-#include "config.h"
-
 #include "auth.h"
 #include "client.h"
 #include "clipboard.h"
 #include "common/clipboard.h"
 #include "cursor.h"
 #include "display.h"
+#include "input.h"
 #include "log.h"
 #include "settings.h"
 #include "vnc.h"
@@ -42,6 +41,7 @@
 #include <guacamole/client.h>
 #include <guacamole/display.h>
 #include <guacamole/mem.h>
+#include <guacamole/proctitle.h>
 #include <guacamole/protocol.h>
 #include <guacamole/recording.h>
 #include <guacamole/socket.h>
@@ -242,6 +242,9 @@ rfbClient* guac_vnc_get_client(guac_client* client) {
     rfb_client->FinishedFrameBufferUpdate = guac_vnc_finished_frame;
     vnc_client->rfb_GotCopyRect = rfb_client->GotCopyRect;
     rfb_client->GotCopyRect = guac_vnc_copyrect;
+
+    /* Lock key state (KeyboardLedState) update handler */
+    rfb_client->HandleKeyboardLedState = guac_vnc_keyboard_led_state;
 
 #ifdef ENABLE_VNC_TLS_LOCKING
     /* TLS Locking and Unlocking */
@@ -452,9 +455,23 @@ static rfbBool guac_vnc_handle_messages(guac_client* client) {
 
 void* guac_vnc_client_thread(void* data) {
 
+    /* Thread name vnc-worker: main VNC client thread; runs the libvncclient
+     * connection and message loop. */
+    guac_thread_name_set("vnc-worker");
+
     guac_client* client = (guac_client*) data;
     guac_vnc_client* vnc_client = (guac_vnc_client*) client->data;
     guac_vnc_settings* settings = vnc_client->settings;
+
+    /* VNC has no default port (0 == unspecified), so suppress a misleading
+     * ":0" in the title. */
+    char vnc_port[GUAC_USHORT_STRING_BUFSIZE];
+    if (settings->port == 0
+            || guac_itoa_safe(vnc_port, sizeof(vnc_port),
+                    settings->port) < 1)
+        vnc_port[0] = '\0';
+    guac_process_title_set_endpoint(GUAC_VNC_PROCESS_TITLE_NAME,
+            settings->username, settings->hostname, vnc_port);
 
     /* If Wake-on-LAN is enabled, attempt to wake. */
     if (settings->wol_send_packet) {
@@ -694,7 +711,8 @@ void* guac_vnc_client_thread(void* data) {
                 !settings->recording_exclude_mouse,
                 0, /* Touch events not supported */
                 settings->recording_include_keys,
-                settings->recording_write_existing);
+                settings->recording_write_existing,
+                settings->recording_include_clipboard);
     }
 
     /* Create display */
